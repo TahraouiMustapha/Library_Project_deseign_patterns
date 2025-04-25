@@ -1,5 +1,7 @@
 package main.java.myLibrary;
 
+import java.util.Objects;
+
 public class Book {
     private int id;
     private  String title;
@@ -34,7 +36,7 @@ public class Book {
     public int getQuantity() {
         return quantity;
     }
-    
+
     public void incrementQuantity() {
         this.quantity = this.quantity + 1;
     }
@@ -45,6 +47,15 @@ public class Book {
             return true;
         }
         return false;
+    }
+
+    @Override
+    // override equals method to compare just the title, autor, category
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return title.equals(book.title) && author.equals(book.author) && category.equals(book.category);
     }
 
     @Override 
