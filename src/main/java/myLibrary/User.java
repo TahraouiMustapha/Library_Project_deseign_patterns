@@ -20,25 +20,38 @@ public abstract class User {
     public String getName() {
         return name;
     }
-    
+
     public String getEmail() {
         return email;
+    }
+
+    abstract boolean getIsAdmin();
+
+    @Override 
+    public String toString() {
+        return "id:" + this.id + "\nname: "+ this.name + "\nemail: "+this.email +"\nis admin:"+ this.getIsAdmin();
     }
 }
 
 class Admin extends User {
-    private boolean isAdmin;
     public Admin(int id, String name, String email) {
         super(id, name, email);
-        this.isAdmin = true;
+    }
+
+    @Override 
+    boolean getIsAdmin() {
+        return true;
     }
 }
 
 class Reader extends User {
-    private boolean isAdmin;
     public Reader(int id, String name, String email) {
         super(id, name, email);
-        this.isAdmin = false;
+    }
+
+    @Override
+    boolean getIsAdmin() {
+        return false;
     }
 }
 
