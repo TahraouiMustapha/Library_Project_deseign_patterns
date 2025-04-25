@@ -3,7 +3,7 @@ package main.java.myLibrary;
 import java.util.ArrayList;
 import java.util.List;
 
-// singleton pattern for the library
+// singleton pattern to manage the unique library
 public class LibrarySingleton {
     private static LibrarySingleton instance = null;
     private List<User> admins = new ArrayList<>();

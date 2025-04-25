@@ -1,6 +1,5 @@
 package main.java.myLibrary;
 
-import java.util.Objects;
 
 public class Book {
     private int id;
