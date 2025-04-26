@@ -45,7 +45,6 @@ public class UserInterfaceCli {
             scanner.nextLine();
             System.out.println("Enter your email: ");
             userEmail = scanner.nextLine();
-            scanner.nextLine();
             // add an admin to library
             User newAdmin =  adminFactory.createUser(id, userName, userEmail);
             LibrarySingleton.getLibraryInstance().addAdmin(newAdmin);
@@ -60,7 +59,6 @@ public class UserInterfaceCli {
             scanner.nextLine();
             System.out.println("Enter your email: ");
             userEmail = scanner.nextLine();
-            scanner.nextLine();
             // add a user to library
             User newReader = readerFactory.createUser(id, userName, userEmail);
             LibrarySingleton.getLibraryInstance().addReader(newReader);
@@ -84,7 +82,6 @@ public class UserInterfaceCli {
         scanner.nextLine();
         System.out.println("Enter your email: ");
         userEmail = scanner.nextLine();
-        scanner.nextLine();
 
         if(LibrarySingleton.getLibraryInstance().checkUser(userName, userEmail)) {
             // succes sign in
@@ -226,6 +223,8 @@ class LibraryInterfaceForAdmin implements LibraryInterfaceForUser {
         if (!bookFound) {
             System.out.println("Invalid ID, please try again.");
             choosingBook(resultOfSearching);
+        } else {
+            UserInterface();
         }
     }
 }
@@ -305,9 +304,35 @@ class LibraryInterfaceForReader implements LibraryInterfaceForUser{
 
     @Override 
     public void choosingBook(List<Book> resultOfSearching) {
-        // logic of borrew
+        for(Book book: resultOfSearching) {
+            System.out.println(book.toString());
+        }
 
-        System.out.println("good ");
+        System.out.println("Enter the ID of the book you want to borrow: ");
+        int bookId = scanner.nextInt();
+        scanner.nextLine(); 
+
+        User logedIn = LibrarySingleton.getLibraryInstance().getLogedIn();
+        boolean bookFound = false;
+
+        for (Book book : resultOfSearching) {
+            if (book.getId() == bookId) {
+                bookFound = true;
+                logedIn.addBorrowedBook(book);
+                book.decrementQuantity();
+                if(book.getQuantity() == 0) LibrarySingleton.getLibraryInstance().removeBook(bookId);
+                System.out.println("Book borrowed !" );
+                break;
+            }
+        }
+
+        if (!bookFound) {
+            System.out.println("Invalid ID, please try again.");
+            choosingBook(resultOfSearching);
+        } else {
+            UserInterface();
+        }
+
     }
 
 }

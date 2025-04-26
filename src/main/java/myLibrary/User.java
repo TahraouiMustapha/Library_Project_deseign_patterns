@@ -1,16 +1,21 @@
 package main.java.myLibrary;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // factory method pattern to manage users
 
 public abstract class User {
     private int id;
     private String name;
     private String email;
+    private List<Book> borrowedBooks;
 
     public User( int id, String name, String email) {
         this.id = id; 
         this.name =  name;
         this.email = email;
+        this.borrowedBooks = new ArrayList<>();
     }
 
     public int getId() {
@@ -23,6 +28,17 @@ public abstract class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public void addBorrowedBook(Book newBook) {
+        for(Book book: borrowedBooks) {
+            if(book.equals(newBook)) {
+                book.incrementQuantity();
+                return;
+            }
+        }
+
+        borrowedBooks.add(newBook);
     }
 
     abstract boolean getIsAdmin();
