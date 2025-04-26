@@ -17,3 +17,7 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 
 The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
 # Library_Project_deseign_patterns
+
+# To Run Project on terminal
+javac -d bin src/main/java/myLibrary/*.java 
+java -cp bin main.java.myLibrary.Main
