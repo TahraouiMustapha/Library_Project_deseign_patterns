@@ -19,5 +19,5 @@ The `JAVA PROJECTS` view allows you to manage your dependencies. More details ca
 # Library_Project_deseign_patterns
 
 # To Run Project on terminal
-javac -d bin src/main/java/myLibrary/*.java 
-java -cp bin main.java.myLibrary.Main
+- javac -d bin src/main/java/myLibrary/*.java 
+- java -cp bin main.java.myLibrary.Main
