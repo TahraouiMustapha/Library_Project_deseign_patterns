@@ -1,6 +1,8 @@
 package main.java.myLibrary;
 
+import java.util.List;
 import java.util.Scanner;
+
 
 public class UserInterfaceCli {
     private Scanner scanner = new Scanner(System.in);
@@ -31,16 +33,33 @@ public class UserInterfaceCli {
         String userName ;
         String userEmail ;
 
+        LibraryInterfaceForAdmin adminUi = new LibraryInterfaceForAdmin();
+
         if(choice == 1) {
             System.out.println("=======================\nSign up as admin");
+            
+            System.out.println("Enter your name: ");
             userName = scanner.nextLine();
+            scanner.nextLine();
+            System.out.println("Enter your email: ");
             userEmail = scanner.nextLine();
-            adminFactory.createUser(id, userName, userEmail);
+            scanner.nextLine();
+            // add an admin to library
+            LibrarySingleton.getLibraryInstance().addAdmin(adminFactory.createUser(id, userName, userEmail));
+            // success sign up
+            adminUi.UserInterface();
+
         } else if(choice == 2){
             System.out.println("=======================\nSign up as reader");
+            System.out.println("Enter your name: ");
             userName = scanner.nextLine();
+            scanner.nextLine();
+            System.out.println("Enter your email: ");
             userEmail = scanner.nextLine();
-            readerFactory.createUser(id, userName, userEmail);
+            scanner.nextLine();
+            // add a user to library
+            LibrarySingleton.getLibraryInstance().addReader(readerFactory.createUser(id, userName, userEmail));
+            // success sign up
         } else {
             System.out.println("repeat your answer");
             signUp();
@@ -50,8 +69,183 @@ public class UserInterfaceCli {
 
     public void signIn() {
         System.out.println("=====================\n Sign In");
+        String userName;
+        String userEmail;
+
+        System.out.println("Enter your name: ");
+        userName = scanner.nextLine();
+        scanner.nextLine();
+        System.out.println("Enter your email: ");
+        userEmail = scanner.nextLine();
+        scanner.nextLine();
+
+
+
+        if(LibrarySingleton.getLibraryInstance().checkUser(userName, userEmail)) {
+            // succes sign in
+        } else {
+            System.out.println("user doesn't exist");
+            signIn();
+        }
+    }
+}
+
+
+interface LibraryInterfaceForUser {
+    public void UserInterface();
+    public void searchInterfaceCLI();
+    public void choosingBook(List<Book> resultOfSearching);
+}
+
+class LibraryInterfaceForAdmin implements LibraryInterfaceForUser {
+    private Scanner scanner = new Scanner(System.in);
+
+    @Override
+    public void UserInterface() {
+        System.out.println("======================= Admin interface");
+        System.out.println("Enter your choice: \n1.add book \n2.remove book \n3.exit");
+        int choice = scanner.nextInt();
+        if(choice == 1){
+            int id = LibrarySingleton.getLibraryInstance().getBooks().size();
+            System.out.println("Enter book title: ");
+            scanner.nextLine(); // Consume the newline
+            String title = scanner.nextLine();
+
+            System.out.println("Enter book author: ");
+            String author = scanner.nextLine();
+
+            System.out.println("Enter book category: ");
+            String category = scanner.nextLine();
+
+            // Add the book to the library
+            LibrarySingleton.getLibraryInstance().addBook(new Book(id, title, author, category, 0));
+
+            System.out.println("Book added successfully!");
+            UserInterface();
+        } else if(choice == 2) {
+            searchInterfaceCLI();
+        } else if(choice == 3) {
+            System.exit(0);
+        } else {
+            System.out.println("repeat your answer");
+            UserInterface();
+        }
     }
 
+    @Override
+    public void searchInterfaceCLI () {
+        System.out.println("====================================== Remove a book");
+        System.out.println("Enter your choice: \n1. Search by title \n2. Search by category \n3. Search by author");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        SearchContext searchContext = new SearchContext();
+        List<Book> ourBooks = LibrarySingleton.getLibraryInstance().getBooks();
+        List<Book> resultList; 
+        
+        if (choice == 1) {
+            System.out.println("Enter the title: ");
+            String title = scanner.nextLine();
+            searchContext.setStrategyMethod(new SearchByTitle());
+            resultList = searchContext.search(ourBooks, title);
+
+            // showing the results
+            if(resultList.size() > 0) {
+                choosingBook(resultList);
+            } else {
+                System.out.println("no book found");
+                searchInterfaceCLI();
+            }
+        } else if (choice == 2) {
+            System.out.println("Enter the category: ");
+            String category = scanner.nextLine();
+            searchContext.setStrategyMethod(new SearchByCategory());
+            resultList = searchContext.search(ourBooks, category);
+
+            // showing the results
+            if(resultList.size() > 0) {
+                choosingBook(resultList);
+            } else {
+                System.out.println("no book found");
+                searchInterfaceCLI();
+            }
+
+        } else if (choice == 3) {
+            System.out.println("Enter the author: ");
+            String author = scanner.nextLine();
+            searchContext.setStrategyMethod(new SearchByAuthor());
+            resultList = searchContext.search(ourBooks, author);
+
+            // showing the results
+            if(resultList.size() > 0) {
+                choosingBook(resultList);
+            } else {
+                System.out.println("no book found");
+                searchInterfaceCLI();
+            }
+
+        } else {
+            System.out.println("Invalid choice, please try again.");
+            searchInterfaceCLI();
+        }
+    }
+
+    @Override 
+    public void choosingBook(List<Book> resultOfSearching) {
+        for(Book book: resultOfSearching) {
+            System.out.println(book.toString());
+        }
+
+        System.out.println("Enter the ID of the book you want to remove: ");
+        int bookId = scanner.nextInt();
+        scanner.nextLine(); 
+
+        boolean bookFound = false;
+        for (Book book : resultOfSearching) {
+            if (book.getId() == bookId) {
+                LibrarySingleton.getLibraryInstance().removeBook(bookId);
+                bookFound = true;
+                System.out.println("Book removed !" );
+                break;
+            }
+        }
+
+        if (!bookFound) {
+            System.out.println("Invalid ID, please try again.");
+            choosingBook(resultOfSearching);
+        }
+    }
+}
+
+class LibraryInterfaceForReader implements LibraryInterfaceForUser{
+    private Scanner scanner = new Scanner(System.in);
+
+    @Override
+    public void UserInterface() {
+        System.out.println("================================ Reader interface");
+        System.out.println("Enter your choice : \n1.borrow \n2.exit");
+
+        int choice = scanner.nextInt();
+        if(choice == 1) {
+             
+        } else if(choice == 2) {
+            System.exit(0);
+        } else {
+            System.out.println("repeat your answer");
+            UserInterface();
+        }
+    }
     
 
+    @Override 
+    public void searchInterfaceCLI() {
+
+    }
+
+    @Override 
+    public void choosingBook(List<Book> resultOfSearching) {
+
+    }
+
 }
+

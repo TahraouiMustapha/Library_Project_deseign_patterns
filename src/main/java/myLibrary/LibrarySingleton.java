@@ -66,4 +66,53 @@ public class LibrarySingleton {
     public List<Book> getBooks() {
         return books;
     }
+
+    public List<User> getAdmins() {
+        return admins;
+    }
+
+    public List<User> getReaders() {
+        return readers;
+    }
+
+    public int getUsersNumber() {
+        return admins.size() + readers.size();
+    }
+
+    public void addAdmin(User newUser) {
+        for(User user: admins) {
+            if(user.equals(newUser)) {
+                System.out.println("User exist before");
+                return;
+            }
+        }
+        admins.add(newUser);
+    }
+
+    public void addReader(User newUser) {
+        for(User reader: readers) {
+            if(reader.equals(newUser)) {
+                System.out.println("User exist before");
+                return;
+            }
+        }
+        readers.add(newUser);
+    }
+
+    public boolean checkUser(String name, String email) {
+        for(User admin: admins) {
+            if(name.equals(admin.getName()) || email.equals(admin.getEmail())) {
+                return true;
+            }
+        }
+
+        for(User reader: readers) {
+            if(name.equals(reader.getName()) || email.equals(reader.getEmail())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
