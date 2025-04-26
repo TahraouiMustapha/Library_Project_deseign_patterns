@@ -10,6 +10,9 @@ public class UserInterfaceCli {
     UserCreator adminFactory = new AdminCreator(); 
     UserCreator readerFactory = new ReaderCreator();
 
+    LibraryInterfaceForAdmin adminUi = new LibraryInterfaceForAdmin();
+    LibraryInterfaceForReader readerUi = new LibraryInterfaceForReader();
+
     public void firstInterface() {
         System.out.println("Welcome to our Library: \n Enter your choice : \n1.sign up \n2.sign in");
         int choice = scanner.nextInt();
@@ -33,7 +36,6 @@ public class UserInterfaceCli {
         String userName ;
         String userEmail ;
 
-        LibraryInterfaceForAdmin adminUi = new LibraryInterfaceForAdmin();
 
         if(choice == 1) {
             System.out.println("=======================\nSign up as admin");
@@ -45,8 +47,10 @@ public class UserInterfaceCli {
             userEmail = scanner.nextLine();
             scanner.nextLine();
             // add an admin to library
-            LibrarySingleton.getLibraryInstance().addAdmin(adminFactory.createUser(id, userName, userEmail));
+            User newAdmin =  adminFactory.createUser(id, userName, userEmail);
+            LibrarySingleton.getLibraryInstance().addAdmin(newAdmin);
             // success sign up
+            LibrarySingleton.getLibraryInstance().setLogedIn(newAdmin);
             adminUi.UserInterface();
 
         } else if(choice == 2){
@@ -58,8 +62,11 @@ public class UserInterfaceCli {
             userEmail = scanner.nextLine();
             scanner.nextLine();
             // add a user to library
-            LibrarySingleton.getLibraryInstance().addReader(readerFactory.createUser(id, userName, userEmail));
+            User newReader = readerFactory.createUser(id, userName, userEmail);
+            LibrarySingleton.getLibraryInstance().addReader(newReader);
             // success sign up
+            LibrarySingleton.getLibraryInstance().setLogedIn(newReader);
+            readerUi.UserInterface();
         } else {
             System.out.println("repeat your answer");
             signUp();
@@ -79,10 +86,16 @@ public class UserInterfaceCli {
         userEmail = scanner.nextLine();
         scanner.nextLine();
 
-
-
         if(LibrarySingleton.getLibraryInstance().checkUser(userName, userEmail)) {
             // succes sign in
+            User theLogedIn = LibrarySingleton.getLibraryInstance().getUser(userName, userEmail);
+            LibrarySingleton.getLibraryInstance().setLogedIn(theLogedIn);
+
+            if (theLogedIn.getIsAdmin()) {
+                adminUi.UserInterface();
+            } else {
+                readerUi.UserInterface();
+            }
         } else {
             System.out.println("user doesn't exist");
             signIn();
@@ -227,7 +240,7 @@ class LibraryInterfaceForReader implements LibraryInterfaceForUser{
 
         int choice = scanner.nextInt();
         if(choice == 1) {
-             
+            searchInterfaceCLI();
         } else if(choice == 2) {
             System.exit(0);
         } else {
@@ -239,12 +252,62 @@ class LibraryInterfaceForReader implements LibraryInterfaceForUser{
 
     @Override 
     public void searchInterfaceCLI() {
+        System.out.println("====================================== Search for a book");
+        System.out.println("Enter your choice: \n1. Search by title \n2. Search by category \n3. Search by author");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
 
+        SearchContext searchContext = new SearchContext();
+        List<Book> ourBooks = LibrarySingleton.getLibraryInstance().getBooks();
+        List<Book> resultList;
+
+        if (choice == 1) {
+            System.out.println("Enter the title: ");
+            String title = scanner.nextLine();
+            searchContext.setStrategyMethod(new SearchByTitle());
+            resultList = searchContext.search(ourBooks, title);
+
+            if (resultList.size() > 0) {
+                choosingBook(resultList);
+            } else {
+                System.out.println("No book found");
+                searchInterfaceCLI();
+            }
+        } else if (choice == 2) {
+            System.out.println("Enter the category: ");
+            String category = scanner.nextLine();
+            searchContext.setStrategyMethod(new SearchByCategory());
+            resultList = searchContext.search(ourBooks, category);
+
+            if (resultList.size() > 0) {
+                choosingBook(resultList);
+            } else {
+                System.out.println("No book found");
+                searchInterfaceCLI();
+            }
+        } else if (choice == 3) {
+            System.out.println("Enter the author: ");
+            String author = scanner.nextLine();
+            searchContext.setStrategyMethod(new SearchByAuthor());
+            resultList = searchContext.search(ourBooks, author);
+
+            if (resultList.size() > 0) {
+                choosingBook(resultList);
+            } else {
+                System.out.println("No book found");
+                searchInterfaceCLI();
+            }
+        } else {
+            System.out.println("Invalid choice, please try again.");
+            searchInterfaceCLI();
+        }
     }
 
     @Override 
     public void choosingBook(List<Book> resultOfSearching) {
+        // logic of borrew
 
+        System.out.println("good ");
     }
 
 }

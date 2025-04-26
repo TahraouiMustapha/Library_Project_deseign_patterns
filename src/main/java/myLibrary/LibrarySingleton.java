@@ -10,13 +10,15 @@ public class LibrarySingleton {
     private List<User> readers = new ArrayList<>();
     private List<Book> books = new ArrayList<>();
 
+    private User logedIn ;
+
     private LibrarySingleton() {
         // library mock database
         UserCreator adminFactory = new AdminCreator(); 
         UserCreator readerFactory = new ReaderCreator();
         
-        User admin1 = adminFactory.createUser(0, "akram" , "ahmad@gmail.com");
-        User reader1 = readerFactory.createUser(1, "aziz" , "kimo@gmail.com");
+        User admin1 = adminFactory.createUser(0, "akram" , "akram@gmail.com");
+        User reader1 = readerFactory.createUser(1, "kimo" , "kimo@gmail.com");
         admins.add(admin1);
         readers.add(reader1);
 
@@ -75,6 +77,22 @@ public class LibrarySingleton {
         return readers;
     }
 
+    public User getUser(String name, String email){
+        for(User admin: admins) {
+            if(name.equals(admin.getName()) || email.equals(admin.getEmail())) {
+                return admin;
+            }
+        }
+
+        for(User reader: readers) {
+            if(name.equals(reader.getName()) || email.equals(reader.getEmail())) {
+                return reader;
+            }
+        }
+
+        return null;
+    }
+
     public int getUsersNumber() {
         return admins.size() + readers.size();
     }
@@ -113,6 +131,15 @@ public class LibrarySingleton {
         }
 
         return false;
+    }
+
+
+    public User getLogedIn() {
+        return logedIn;
+    }
+
+    public void setLogedIn(User logedIn) {
+        this.logedIn = logedIn;
     }
 
 }
